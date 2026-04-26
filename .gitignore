@@ -1,2 +1,10 @@
 .idea/
 .DS_Store
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+*.log
+tsconfig.app.tsbuildinfo
+tsconfig.node.tsbuildinfo
