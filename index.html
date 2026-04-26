@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>인사약 — 진심을 담은 사과 연습</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFF6E5;
+    --bg-card: #FFFFFF;
+    --bg-soft: #FFEED1;
+    --ink: #3D2E20;
+    --ink-soft: #6B5A4A;
+    --ink-light: #A8957F;
+    --primary: #FF8B6B;
+    --primary-dark: #E66A4A;
+    --accent: #6FCFB1;
+    --accent-dark: #3FA88A;
+    --warn: #F4B860;
+    --bad: #E8746A;
+    --step1: #B79CED;
+    --step2: #FF9FAE;
+    --step3: #6FCFB1;
+    --r-md: 14px;
+    --r-lg: 22px;
+    --r-pill: 999px;
+    --shadow: 0 4px 0 rgba(61,46,32,0.12);
+    --shadow-lift: 0 6px 0 rgba(61,46,32,0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Gowun Dodum', sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background:
+      radial-gradient(circle at 10% 0%, #FFE4B5 0%, transparent 35%),
+      radial-gradient(circle at 95% 100%, #FFD3D3 0%, transparent 40%),
+      var(--bg);
+  }
+  h1, h2, h3, .display { font-family: 'Jua', sans-serif; font-weight: 400; letter-spacing: -0.5px; }
+
+  #app {
+    width: 100%;
+    height: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .screen { display: none; flex: 1; flex-direction: column; animation: fadeIn 0.4s ease; }
+  .screen.active { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .crumb { font-size: 14px; color: var(--ink-soft); }
+  .icon-btn {
+    background: var(--bg-card);
+    border: 2px solid #EFE2CC;
+    border-radius: var(--r-pill);
+    padding: 8px 16px;
+    font-family: inherit; font-size: 14px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform 0.1s;
+  }
+  .icon-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(61,46,32,0.12); }
+
+  .home {
+    align-items: center; justify-content: center;
+    text-align: center; gap: 8px;
+  }
+  .home .title {
+    font-size: clamp(48px, 8vw, 88px);
+    color: var(--primary);
+    line-height: 1;
+    margin-bottom: 4px;
+    letter-spacing: -2px;
+  }
+  .home .title span { display: inline-block; }
+  .home .title span:nth-child(1) { color: var(--step1); animation: bob 2s ease-in-out infinite; }
+  .home .title span:nth-child(2) { color: var(--step2); animation: bob 2s ease-in-out infinite 0.2s; }
+  .home .title span:nth-child(3) { color: var(--step3); animation: bob 2s ease-in-out infinite 0.4s; }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .home .subtitle {
+    font-size: 18px; color: var(--ink-soft);
+    margin-bottom: 32px;
+  }
+  .mascot { width: 180px; height: 180px; margin-bottom: 24px; }
+  .mascot.float { animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-10px) rotate(2deg); } }
+
+  .big-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--r-pill);
+    padding: 18px 48px;
+    font-family: 'Jua', sans-serif;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 var(--primary-dark);
+    transition: all 0.1s;
+    margin: 4px;
+  }
+  .big-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--primary-dark); }
+  .big-btn.secondary {
+    background: var(--bg-card);
+    color: var(--primary);
+    box-shadow: 0 6px 0 #EFE2CC;
+    border: 2px solid #EFE2CC;
+  }
+  .big-btn.secondary:active { box-shadow: 0 2px 0 #EFE2CC; }
+
+  .home .progress-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bg-card);
+    padding: 8px 18px;
+    border-radius: var(--r-pill);
+    border: 2px solid var(--bg-soft);
+    font-size: 14px; color: var(--ink-soft);
+    margin-bottom: 20px;
+  }
+  .home .progress-pill b { color: var(--primary-dark); font-weight: 700; }
+
+  .step-indicator {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-bottom: 18px;
+  }
+  .step-pill {
+    padding: 10px 22px;
+    border-radius: var(--r-pill);
+    background: var(--bg-card);
+    border: 2px solid #EFE2CC;
+    font-family: 'Jua', sans-serif;
+    font-size: 17px;
+    color: var(--ink-light);
+    transition: all 0.3s;
+  }
+  .step-pill.active {
+    color: white;
+    border-color: transparent;
+    transform: scale(1.05);
+  }
+  .step-pill.active.s1 { background: var(--step1); }
+  .step-pill.active.s2 { background: var(--step2); }
+  .step-pill.active.s3 { background: var(--step3); }
+  .step-pill.done {
+    background: #E8F6F0;
+    color: var(--accent-dark);
+    border-color: var(--accent);
+  }
+  .step-conn { width: 24px; height: 3px; background: #EFE2CC; border-radius: 2px; }
+  .step-conn.done { background: var(--accent); }
+
+  .game-body {
+    flex: 1;
+    display: grid;
+    grid-template-rows: auto auto auto;
+    gap: 14px;
+  }
+  .situation-card {
+    background: var(--bg-card);
+    border-radius: var(--r-lg);
+    padding: 18px 22px;
+    box-shadow: var(--shadow);
+    border: 2px solid #EFE2CC;
+    display: flex; align-items: center; gap: 18px;
+  }
+  .situation-card .scene { flex-shrink: 0; width: 160px; height: 130px; }
+  .situation-card .text { flex: 1; }
+  .situation-card .label {
+    font-size: 13px; color: var(--ink-light); margin-bottom: 4px;
+  }
+  .situation-card p {
+    font-size: 18px; color: var(--ink); line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .play-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bg-soft);
+    border: none;
+    border-radius: var(--r-pill);
+    padding: 8px 16px;
+    font-family: inherit; font-size: 14px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .play-btn:active { transform: scale(0.97); }
+  .play-btn.playing svg { animation: pulse 0.5s ease-in-out infinite alternate; }
+  @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.15); } }
+
+  .helper-text {
+    text-align: center; color: var(--ink-soft);
+    font-size: 14px; margin-bottom: -4px;
+  }
+
+  .sentence-card {
+    background: linear-gradient(180deg, #FFF8EC 0%, #FFEED1 100%);
+    border-radius: var(--r-lg);
+    border: 2px solid #F4D9A8;
+    padding: 22px 28px;
+    text-align: center;
+  }
+  .sentence-card .sentence {
+    font-family: 'Jua', sans-serif;
+    font-size: clamp(22px, 3vw, 32px);
+    line-height: 1.8;
+    color: var(--ink);
+  }
+  .blank {
+    display: inline-block;
+    min-width: 110px;
+    padding: 4px 18px;
+    margin: 0 4px;
+    border-radius: var(--r-pill);
+    background: white;
+    border: 3px dashed #D8B895;
+    color: var(--ink-light);
+    font-size: 0.85em;
+    vertical-align: middle;
+    transition: all 0.3s;
+  }
+  .blank.filled {
+    background: var(--accent);
+    border: 3px solid var(--accent-dark);
+    color: white;
+  }
+  .blank.shake { animation: shake 0.4s; }
+  @keyframes shake {
+    10%,90% { transform: translateX(-2px); }
+    20%,80% { transform: translateX(3px); }
+    30%,50%,70% { transform: translateX(-5px); }
+    40%,60% { transform: translateX(5px); }
+  }
+
+  .word-tray {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .word-block {
+    background: var(--bg-card);
+    border: 3px solid #EFE2CC;
+    border-radius: var(--r-md);
+    padding: 18px 8px;
+    font-family: 'Jua', sans-serif;
+    font-size: clamp(18px, 2.2vw, 24px);
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: 0 4px 0 #DCC9AC;
+    transition: all 0.12s;
+  }
+  .word-block:hover { background: var(--bg-soft); }
+  .word-block:active { transform: translateY(3px); box-shadow: 0 1px 0 #DCC9AC; }
+  .word-block.right {
+    background: var(--accent);
+    border-color: var(--accent-dark);
+    color: white;
+    box-shadow: 0 4px 0 var(--accent-dark);
+    animation: pop 0.4s;
+  }
+  .word-block.wrong {
+    background: #FFD8D5;
+    border-color: var(--bad);
+    color: var(--bad);
+    animation: shake 0.4s;
+  }
+  .word-block.disabled { opacity: 0.4; pointer-events: none; }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+    100% { transform: scale(1); }
+  }
+
+  /* Overlay */
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(61,46,32,0.4);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 100;
+    padding: 24px;
+  }
+  .overlay.active { display: flex; animation: fadeIn 0.3s; }
+  .overlay-card {
+    background: var(--bg-card);
+    border-radius: var(--r-lg);
+    padding: 32px 28px;
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 0 rgba(61,46,32,0.18);
+    animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes pop-in {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .overlay-card .feedback-icon {
+    width: 90px; height: 90px; margin: 0 auto 16px;
+  }
+  .overlay-card h2 {
+    font-size: 32px; color: var(--primary-dark);
+    margin-bottom: 8px;
+  }
+  .overlay-card .full-sentence {
+    background: var(--bg-soft);
+    border-radius: var(--r-md);
+    padding: 16px;
+    font-size: 18px; color: var(--ink);
+    margin: 16px 0;
+    line-height: 1.7;
+  }
+  .overlay-card .feedback-text {
+    color: var(--ink-soft);
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  /* Confetti */
+  .confetti { position: absolute; width: 10px; height: 14px; top: -20px; opacity: 0; }
+  .confetti.go { animation: fall 2.5s linear forwards; }
+  @keyframes fall {
+    0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+    100% { opacity: 0; transform: translateY(110vh) rotate(720deg); }
+  }
+
+  /* Badges screen */
+  .badge-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .badge-card {
+    background: var(--bg-card);
+    border-radius: var(--r-lg);
+    padding: 20px 12px;
+    text-align: center;
+    border: 2px solid #EFE2CC;
+    box-shadow: var(--shadow);
+  }
+  .badge-card.locked { opacity: 0.45; filter: grayscale(0.6); }
+  .badge-card svg { width: 64px; height: 64px; margin-bottom: 8px; }
+  .badge-card .name { font-family: 'Jua', sans-serif; font-size: 16px; color: var(--ink); margin-bottom: 2px; }
+  .badge-card .desc { font-size: 12px; color: var(--ink-light); }
+
+  .home-actions { display: flex; flex-wrap: wrap; justify-content: center; }
+
+  /* Mute button */
+  #muteBtn {
+    position: absolute; top: 24px; right: 24px;
+    z-index: 50;
+    background: var(--bg-card);
+    border: 2px solid #EFE2CC;
+    border-radius: 50%;
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+
+  @media (max-width: 600px) {
+    #app { padding: 14px; }
+    .situation-card { flex-direction: column; gap: 10px; padding: 14px; }
+    .situation-card .scene { width: 130px; height: 100px; }
+    .word-tray { grid-template-columns: repeat(2, 1fr); }
+    .step-pill { padding: 8px 14px; font-size: 14px; }
+    .blank { min-width: 80px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <button id="muteBtn" title="음성 켜기/끄기" aria-label="음성">🔊</button>
+
+  <!-- ============ HOME SCREEN ============ -->
+  <section class="screen home active" id="screen-home">
+    <svg class="mascot float" viewBox="0 0 200 200" aria-hidden="true">
+      <ellipse cx="100" cy="180" rx="65" ry="8" fill="#F4D9A8" opacity="0.6"/>
+      <circle cx="100" cy="100" r="70" fill="#FFD27D"/>
+      <circle cx="62" cy="62" r="22" fill="#FFD27D"/>
+      <circle cx="138" cy="62" r="22" fill="#FFD27D"/>
+      <circle cx="62" cy="62" r="10" fill="#FFB347"/>
+      <circle cx="138" cy="62" r="10" fill="#FFB347"/>
+      <ellipse cx="78" cy="100" rx="6" ry="9" fill="#3D2E20"/>
+      <ellipse cx="122" cy="100" rx="6" ry="9" fill="#3D2E20"/>
+      <ellipse cx="80" cy="98" rx="2" ry="3" fill="white"/>
+      <ellipse cx="124" cy="98" rx="2" ry="3" fill="white"/>
+      <ellipse cx="100" cy="118" rx="8" ry="6" fill="#3D2E20"/>
+      <path d="M 88 130 Q 100 142 112 130" stroke="#3D2E20" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="68" cy="118" r="6" fill="#FF9FAE" opacity="0.7"/>
+      <circle cx="132" cy="118" r="6" fill="#FF9FAE" opacity="0.7"/>
+    </svg>
+    <h1 class="title display">
+      <span>인</span><span>사</span><span>약</span>
+    </h1>
+    <p class="subtitle">진심을 담은 사과 연습</p>
+    <div class="progress-pill">
+      <span>오늘까지 모은 배지</span>
+      <b id="homeBadgeCount">0</b>
+      <span>개</span>
+    </div>
+    <div class="home-actions">
+      <button class="big-btn" id="startBtn">시작하기</button>
+      <button class="big-btn secondary" id="badgesBtn">내 배지 보기</button>
+    </div>
+  </section>
+
+  <!-- ============ GAME SCREEN ============ -->
+  <section class="screen" id="screen-game">
+    <div class="top-bar">
+      <button class="icon-btn" data-act="home">← 홈으로</button>
+      <span class="crumb" id="crumb">상황 1 / 3</span>
+      <button class="icon-btn" data-act="teacher">교사 모드</button>
+    </div>
+    <div class="step-indicator" id="stepIndicator"></div>
+    <div class="game-body">
+      <div class="situation-card">
+        <svg class="scene" id="scene" viewBox="0 0 200 160" aria-hidden="true"></svg>
+        <div class="text">
+          <div class="label" id="situationLabel">상황</div>
+          <p id="situationDesc">...</p>
+          <button class="play-btn" id="replayBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            <span>다시 듣기</span>
+          </button>
+        </div>
+      </div>
+      <p class="helper-text" id="helperText">친구의 마음을 알아주세요</p>
+      <div class="sentence-card">
+        <div class="sentence" id="sentence"></div>
+      </div>
+      <div class="word-tray" id="wordTray"></div>
+    </div>
+  </section>
+
+  <!-- ============ BADGES SCREEN ============ -->
+  <section class="screen" id="screen-badges">
+    <div class="top-bar">
+      <button class="icon-btn" data-act="home">← 홈으로</button>
+      <span class="crumb">내 배지</span>
+      <span style="width: 80px;"></span>
+    </div>
+    <div style="text-align:center; margin: 12px 0 4px;">
+      <h2 class="display" style="font-size:32px; color:var(--primary-dark);">잘하고 있어요!</h2>
+      <p style="color:var(--ink-soft);">사과를 연습할 때마다 배지를 모을 수 있어요.</p>
+    </div>
+    <div class="badge-grid" id="badgeGrid"></div>
+  </section>
+
+  <!-- ============ OVERLAYS ============ -->
+  <div class="overlay" id="overlay">
+    <div class="overlay-card" id="overlayCard"></div>
+  </div>
+
+  <div id="confettiHolder" style="position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index: 90;"></div>
+</div>
+
+<script>
+/* ===========================================================
+   인사약 — 단일 파일 프로토타입
+   클린 아키텍처 매핑:
+     domain/        → Entities (Situation, Step) + 게임 규칙
+     data/          → SITUATIONS (콘텐츠), Storage (localStorage)
+     application/   → TtsService, GameSession (use case)
+     presentation/  → render*, event handlers
+   실 React 프로젝트로 옮길 때는 이 주석 단위로 파일 분할.
+   =========================================================== */
+
+/* ============ DOMAIN: Entities ============ */
+const STEP_TYPES = Object.freeze({
+  ACKNOWLEDGE: { key: 'acknowledge', label: '① 인정', cls: 's1', helper: '친구의 마음을 알아주세요' },
+  APOLOGIZE:   { key: 'apologize',   label: '② 사과', cls: 's2', helper: '진심으로 미안한 마음을 전해요' },
+  PROMISE:     { key: 'promise',     label: '③ 약속', cls: 's3', helper: '같은 실수를 하지 않겠다고 약속해요' }
+});
+
+/* ============ DATA: 상황 콘텐츠 (책의 실수 상황 예시 기반) ============ */
+const SITUATIONS = [
+  {
+    id: 'foot_step',
+    title: '발 밟기',
+    description: '친구가 지나가는데, 실수로 발을 꽉 밟아버렸어요.',
+    badge: { name: '발걸음 조심', desc: '발 밟기 사과 완성', emoji: 'foot' },
+    scene: 'foot',
+    steps: [
+      { type: STEP_TYPES.ACKNOWLEDGE,
+        before: '내가 실수로 너의 발을 밟아서 너를', after: '했구나.',
+        options: ['아프게', '기쁘게', '슬프게', '졸리게'], correctIndex: 0,
+        praise: '맞아요! 친구의 마음을 먼저 알아주는 게 첫 번째예요.' },
+      { type: STEP_TYPES.APOLOGIZE,
+        before: '정말 미안해. 진심으로', after: '할게.',
+        options: ['사과', '축하', '인사', '자랑'], correctIndex: 0,
+        praise: '잘했어요. 미안한 마음을 솔직하게 말하는 게 사과예요.' },
+      { type: STEP_TYPES.PROMISE,
+        before: '다음부터는', after: '걸어다닐게.',
+        options: ['조심히', '빠르게', '시끄럽게', '거꾸로'], correctIndex: 0,
+        praise: '훌륭해요! 약속까지 하면 진짜 사과가 완성돼요.' }
+    ]
+  },
+  {
+    id: 'block_knock',
+    title: '블록 엎어뜨리기',
+    description: '친구가 열심히 쌓은 블록을 실수로 쓰러뜨렸어요.',
+    badge: { name: '블록 친구', desc: '블록 사과 완성', emoji: 'block' },
+    scene: 'block',
+    steps: [
+      { type: STEP_TYPES.ACKNOWLEDGE,
+        before: '내가 너의 블록을 쓰러뜨려서 너를', after: '했지.',
+        options: ['속상하게', '신나게', '기쁘게', '즐겁게'], correctIndex: 0,
+        praise: '그렇죠. 친구가 속상했을 거예요.' },
+      { type: STEP_TYPES.APOLOGIZE,
+        before: '정말 미안해. 진심으로', after: '할게.',
+        options: ['사과', '구경', '응원', '부탁'], correctIndex: 0,
+        praise: '잘했어요. 진심을 담은 한마디예요.' },
+      { type: STEP_TYPES.PROMISE,
+        before: '다음부터는 친구 옆을', after: '지나갈게.',
+        options: ['조심히', '뛰어서', '거칠게', '큰소리로'], correctIndex: 0,
+        praise: '약속을 지키면 친구도 더 믿어줄 거예요.' }
+    ]
+  },
+  {
+    id: 'water_spill',
+    title: '물 엎지르기',
+    description: '친구의 책상 위에 물을 엎질러서 책이 다 젖었어요.',
+    badge: { name: '깨끗이 함께', desc: '물 사과 완성', emoji: 'water' },
+    scene: 'water',
+    steps: [
+      { type: STEP_TYPES.ACKNOWLEDGE,
+        before: '내가 물을 엎질러서 너의 책을', after: '만들었구나.',
+        options: ['젖게', '마르게', '깨끗하게', '따뜻하게'], correctIndex: 0,
+        praise: '정확해요. 어떤 일이 일어났는지 알아주는 거예요.' },
+      { type: STEP_TYPES.APOLOGIZE,
+        before: '정말 미안해. 진심으로', after: '하고 같이 닦자.',
+        options: ['사과', '인사', '소개', '자랑'], correctIndex: 0,
+        praise: '실수를 함께 해결하려는 마음, 멋져요.' },
+      { type: STEP_TYPES.PROMISE,
+        before: '다음부터는 컵을', after: '들고 다닐게.',
+        options: ['조심히', '한손으로', '흔들면서', '뛰면서'], correctIndex: 0,
+        praise: '약속까지 했으니 진짜 사과 완성!' }
+    ]
+  }
+];
+
+/* ============ DATA: Storage (localStorage 기반 ProgressRepository) ============ */
+const Storage = {
+  KEY: 'insayak.progress.v1',
+  load() {
+    try { return JSON.parse(localStorage.getItem(this.KEY)) || { badges: [], completedSituations: [] }; }
+    catch { return { badges: [], completedSituations: [] }; }
+  },
+  save(data) { localStorage.setItem(this.KEY, JSON.stringify(data)); },
+  earnBadge(badge) {
+    const d = this.load();
+    if (!d.badges.find(b => b.name === badge.name)) {
+      d.badges.push({ ...badge, earnedAt: Date.now() });
+      this.save(d);
+    }
+  },
+  completeSituation(id) {
+    const d = this.load();
+    if (!d.completedSituations.includes(id)) {
+      d.completedSituations.push(id);
+      this.save(d);
+    }
+  }
+};
+
+/* ============ APPLICATION: TtsService (Web Speech API) ============ */
+const Tts = {
+  enabled: true,
+  voice: null,
+  init() {
+    if (!('speechSynthesis' in window)) { this.enabled = false; return; }
+    const pickVoice = () => {
+      const voices = speechSynthesis.getVoices();
+      this.voice = voices.find(v => v.lang === 'ko-KR') || voices.find(v => v.lang.startsWith('ko')) || null;
+    };
+    pickVoice();
+    speechSynthesis.onvoiceschanged = pickVoice;
+  },
+  speak(text) {
+    if (!this.enabled || !('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ko-KR';
+    u.rate = 0.95;
+    u.pitch = 1.05;
+    if (this.voice) u.voice = this.voice;
+    speechSynthesis.speak(u);
+  },
+  stop() { if ('speechSynthesis' in window) speechSynthesis.cancel(); },
+  toggle() { this.enabled = !this.enabled; if (!this.enabled) this.stop(); return this.enabled; }
+};
+
+/* ============ APPLICATION: GameSession (use case 조합) ============ */
+const Session = {
+  situationIndex: 0,
+  stepIndex: 0,
+  filledIndices: [null, null, null],
+  currentSituation() { return SITUATIONS[this.situationIndex]; },
+  currentStep() { return this.currentSituation().steps[this.stepIndex]; },
+  reset(idx = 0) {
+    this.situationIndex = idx;
+    this.stepIndex = 0;
+    this.filledIndices = [null, null, null];
+  },
+  submitAnswer(optionIndex) {
+    const step = this.currentStep();
+    const correct = optionIndex === step.correctIndex;
+    if (correct) this.filledIndices[this.stepIndex] = optionIndex;
+    return { correct, isStepLast: this.stepIndex === 2 };
+  },
+  nextStep() {
+    if (this.stepIndex < 2) { this.stepIndex++; return false; }
+    return true;
+  },
+  buildFullApology() {
+    const s = this.currentSituation();
+    return s.steps.map((step, i) => {
+      const word = step.options[this.filledIndices[i]];
+      return `${step.before} ${word} ${step.after}`.replace(/\s+/g, ' ').trim();
+    }).join(' ');
+  }
+};
+
+/* ============ PRESENTATION: Scenes (간단 SVG 일러스트) ============ */
+const Scenes = {
+  foot: `
+    <ellipse cx="100" cy="148" rx="80" ry="6" fill="#F4D9A8" opacity="0.6"/>
+    <g><circle cx="65" cy="55" r="18" fill="#FFD27D"/>
+       <rect x="53" y="73" width="24" height="44" rx="6" fill="#85B7EB"/>
+       <rect x="55" y="117" width="9" height="20" rx="3" fill="#5F4A3A"/>
+       <rect x="66" y="117" width="9" height="20" rx="3" fill="#5F4A3A"/>
+       <ellipse cx="60" cy="55" rx="2" ry="3" fill="#3D2E20"/>
+       <ellipse cx="70" cy="55" rx="2" ry="3" fill="#3D2E20"/>
+       <path d="M58 62 Q65 67 72 62" stroke="#3D2E20" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+    <g><circle cx="135" cy="55" r="18" fill="#FFB6C1"/>
+       <rect x="123" y="73" width="24" height="44" rx="6" fill="#FF9FAE"/>
+       <rect x="125" y="117" width="9" height="20" rx="3" fill="#5F4A3A"/>
+       <rect x="136" y="117" width="9" height="20" rx="3" fill="#5F4A3A"/>
+       <ellipse cx="130" cy="55" rx="2" ry="3" fill="#3D2E20"/>
+       <ellipse cx="140" cy="55" rx="2" ry="3" fill="#3D2E20"/>
+       <path d="M127 64 Q135 60 143 64" stroke="#3D2E20" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+    <path d="M75 134 L122 134" stroke="#E8746A" stroke-width="3" stroke-linecap="round"/>
+    <g transform="translate(155 25)">
+      <path d="M0 0 L8 -8 M8 0 L0 -8" stroke="#E8746A" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M4 8 L4 14" stroke="#E8746A" stroke-width="2.5" stroke-linecap="round"/>
+    </g>`,
+  block: `
+    <ellipse cx="100" cy="148" rx="80" ry="6" fill="#F4D9A8" opacity="0.6"/>
+    <g><circle cx="55" cy="55" r="18" fill="#FFD27D"/>
+       <rect x="43" y="73" width="24" height="44" rx="6" fill="#7FCBA9"/>
+       <rect x="45" y="117" width="9" height="20" rx="3" fill="#5F4A3A"/>
+       <rect x="56" y="117" width="9" height="20" rx="3" fill="#5F4A3A"/>
+       <ellipse cx="50" cy="55" rx="2" ry="3" fill="#3D2E20"/>
+       <ellipse cx="60" cy="55" rx="2" ry="3" fill="#3D2E20"/>
+       <path d="M48 64 L62 64" stroke="#3D2E20" stroke-width="2" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(95 80) rotate(15)">
+      <rect x="0" y="0" width="28" height="22" rx="3" fill="#FF9FAE"/>
+      <rect x="40" y="-10" width="28" height="22" rx="3" fill="#85B7EB" transform="rotate(25)"/>
+      <rect x="65" y="20" width="28" height="22" rx="3" fill="#FFD27D" transform="rotate(45)"/>
+    </g>
+    <g><circle cx="170" cy="60" r="14" fill="#FFB6C1"/>
+       <ellipse cx="166" cy="60" rx="2" ry="3" fill="#3D2E20"/>
+       <ellipse cx="174" cy="60" rx="2" ry="3" fill="#3D2E20"/>
+       <ellipse cx="170" cy="68" rx="3" ry="2" fill="#3D2E20"/>
+    </g>`,
+  water: `
+    <ellipse cx="100" cy="148" rx="80" ry="6" fill="#F4D9A8" opacity="0.6"/>
+    <rect x="30" y="90" width="140" height="14" rx="2" fill="#C9A678"/>
+    <rect x="30" y="104" width="140" height="6" fill="#A88656"/>
+    <rect x="50" y="68" width="50" height="22" rx="2" fill="white" stroke="#A88656" stroke-width="1.5"/>
+    <line x1="58" y1="76" x2="92" y2="76" stroke="#C9A678" stroke-width="1"/>
+    <line x1="58" y1="82" x2="88" y2="82" stroke="#C9A678" stroke-width="1"/>
+    <g transform="translate(110 50) rotate(40)">
+      <rect x="0" y="0" width="22" height="28" rx="3" fill="#85B7EB"/>
+      <ellipse cx="11" cy="0" rx="11" ry="3" fill="#5DA5DA"/>
+    </g>
+    <ellipse cx="100" cy="92" rx="22" ry="5" fill="#85B7EB" opacity="0.7"/>
+    <ellipse cx="105" cy="89" rx="14" ry="3" fill="#5DA5DA" opacity="0.5"/>
+    <circle cx="120" cy="86" r="3" fill="#85B7EB"/>
+    <circle cx="84" cy="88" r="2" fill="#85B7EB"/>
+    <g><circle cx="160" cy="60" r="14" fill="#FFB6C1"/>
+       <ellipse cx="156" cy="60" rx="2" ry="3" fill="#3D2E20"/>
+       <ellipse cx="164" cy="60" rx="2" ry="3" fill="#3D2E20"/>
+       <path d="M156 68 Q160 65 164 68" stroke="#3D2E20" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    </g>`
+};
+
+const BadgeIcons = {
+  foot: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#FFE4B5" stroke="#E66A4A" stroke-width="2"/>
+    <ellipse cx="26" cy="38" rx="9" ry="14" fill="#FFD27D"/>
+    <circle cx="22" cy="22" r="3" fill="#FFD27D"/><circle cx="28" cy="20" r="3" fill="#FFD27D"/>
+    <circle cx="34" cy="22" r="3" fill="#FFD27D"/><circle cx="40" cy="26" r="3.5" fill="#FFD27D"/></svg>`,
+  block: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#E8F6F0" stroke="#3FA88A" stroke-width="2"/>
+    <rect x="20" y="34" width="11" height="11" fill="#FF9FAE" stroke="#3D2E20" stroke-width="1"/>
+    <rect x="33" y="34" width="11" height="11" fill="#85B7EB" stroke="#3D2E20" stroke-width="1"/>
+    <rect x="26" y="22" width="11" height="11" fill="#FFD27D" stroke="#3D2E20" stroke-width="1"/></svg>`,
+  water: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#E8F2FF" stroke="#5DA5DA" stroke-width="2"/>
+    <path d="M32 14 C24 26, 20 34, 20 42 C20 50, 26 54, 32 54 C38 54, 44 50, 44 42 C44 34, 40 26, 32 14 Z" fill="#85B7EB" stroke="#3D2E20" stroke-width="1.5"/>
+    <ellipse cx="28" cy="40" rx="3" ry="5" fill="white" opacity="0.6"/></svg>`
+};
+
+/* ============ PRESENTATION: 렌더링 함수 ============ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+function renderHome() {
+  const data = Storage.load();
+  document.getElementById('homeBadgeCount').textContent = data.badges.length;
+}
+
+function renderStepIndicator() {
+  const wrap = document.getElementById('stepIndicator');
+  wrap.innerHTML = '';
+  Session.currentSituation().steps.forEach((step, i) => {
+    const pill = document.createElement('div');
+    pill.className = 'step-pill ' + step.type.cls;
+    if (i === Session.stepIndex) pill.classList.add('active');
+    if (i < Session.stepIndex) pill.classList.add('done');
+    pill.textContent = step.type.label;
+    wrap.appendChild(pill);
+    if (i < 2) {
+      const conn = document.createElement('div');
+      conn.className = 'step-conn';
+      if (i < Session.stepIndex) conn.classList.add('done');
+      wrap.appendChild(conn);
+    }
+  });
+}
+
+function renderSentence() {
+  const step = Session.currentStep();
+  const filledIdx = Session.filledIndices[Session.stepIndex];
+  const filled = filledIdx !== null;
+  const wordHtml = filled
+    ? `<span class="blank filled">${step.options[filledIdx]}</span>`
+    : `<span class="blank" id="currentBlank">＿＿＿</span>`;
+  document.getElementById('sentence').innerHTML = `${step.before} ${wordHtml} ${step.after}`;
+}
+
+function renderWordTray() {
+  const step = Session.currentStep();
+  const tray = document.getElementById('wordTray');
+  tray.innerHTML = '';
+  step.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'word-block';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => onPickWord(i, btn));
+    tray.appendChild(btn);
+  });
+}
+
+function renderGameScreen() {
+  const sit = Session.currentSituation();
+  const step = Session.currentStep();
+  document.getElementById('crumb').textContent = `상황 ${Session.situationIndex + 1} / ${SITUATIONS.length}`;
+  document.getElementById('situationLabel').textContent = `상황 · ${sit.title}`;
+  document.getElementById('situationDesc').textContent = sit.description;
+  document.getElementById('scene').innerHTML = Scenes[sit.scene] || '';
+  document.getElementById('helperText').textContent = step.type.helper;
+  renderStepIndicator();
+  renderSentence();
+  renderWordTray();
+}
+
+function speakCurrent() {
+  const sit = Session.currentSituation();
+  const step = Session.currentStep();
+  Tts.speak(`${sit.description} ${step.before} 빈칸 ${step.after}`);
+  const btn = document.getElementById('replayBtn');
+  btn.classList.add('playing');
+  setTimeout(() => btn.classList.remove('playing'), 1500);
+}
+
+function onPickWord(optionIndex, btnEl) {
+  const result = Session.submitAnswer(optionIndex);
+  if (result.correct) {
+    btnEl.classList.add('right');
+    Tts.speak(Session.currentStep().options[optionIndex]);
+    document.querySelectorAll('.word-block').forEach(b => b.classList.add('disabled'));
+    setTimeout(() => {
+      renderSentence();
+      setTimeout(() => showStepFeedback(), 600);
+    }, 500);
+  } else {
+    btnEl.classList.add('wrong');
+    const blank = document.getElementById('currentBlank');
+    if (blank) blank.classList.add('shake');
+    Tts.speak('다시 한번 골라봐요');
+    setTimeout(() => {
+      btnEl.classList.remove('wrong');
+      if (blank) blank.classList.remove('shake');
+    }, 600);
+  }
+}
+
+function showStepFeedback() {
+  const step = Session.currentStep();
+  const isLast = Session.stepIndex === 2;
+  const overlay = document.getElementById('overlay');
+  const card = document.getElementById('overlayCard');
+  card.innerHTML = `
+    <svg class="feedback-icon" viewBox="0 0 90 90">
+      <circle cx="45" cy="45" r="40" fill="#E8F6F0" stroke="#3FA88A" stroke-width="3"/>
+      <path d="M28 46 L40 58 L62 34" stroke="#3FA88A" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h2>잘했어요!</h2>
+    <p class="feedback-text">${step.praise}</p>
+    <button class="big-btn" id="nextStepBtn">${isLast ? '사과 완성하기 →' : '다음 단계로 →'}</button>
+  `;
+  overlay.classList.add('active');
+  Tts.speak(step.praise);
+  document.getElementById('nextStepBtn').onclick = () => {
+    overlay.classList.remove('active');
+    if (Session.nextStep()) showSituationComplete();
+    else { renderGameScreen(); setTimeout(speakCurrent, 300); }
+  };
+}
+
+function showSituationComplete() {
+  const sit = Session.currentSituation();
+  Storage.completeSituation(sit.id);
+  Storage.earnBadge(sit.badge);
+  fireConfetti();
+  const overlay = document.getElementById('overlay');
+  const card = document.getElementById('overlayCard');
+  const fullText = Session.buildFullApology();
+  const hasNext = Session.situationIndex + 1 < SITUATIONS.length;
+  card.innerHTML = `
+    ${BadgeIcons[sit.badge.emoji].replace('viewBox="0 0 64 64"', 'viewBox="0 0 64 64" class="feedback-icon"')}
+    <h2>사과 완성!</h2>
+    <p class="feedback-text">'${sit.badge.name}' 배지를 얻었어요!</p>
+    <div class="full-sentence">${fullText}</div>
+    <div>
+      ${hasNext ? '<button class="big-btn" id="nextSitBtn">다음 상황으로 →</button>' : ''}
+      <button class="big-btn secondary" id="goHomeBtn">홈으로</button>
+    </div>
+  `;
+  overlay.classList.add('active');
+  Tts.speak(`사과 완성! ${fullText}`);
+  if (hasNext) document.getElementById('nextSitBtn').onclick = () => {
+    overlay.classList.remove('active');
+    Session.reset(Session.situationIndex + 1);
+    renderGameScreen();
+    setTimeout(speakCurrent, 300);
+  };
+  document.getElementById('goHomeBtn').onclick = () => {
+    overlay.classList.remove('active');
+    Tts.stop();
+    renderHome();
+    showScreen('home');
+  };
+}
+
+function fireConfetti() {
+  const holder = document.getElementById('confettiHolder');
+  holder.innerHTML = '';
+  const colors = ['#FF8B6B', '#6FCFB1', '#B79CED', '#FF9FAE', '#FFD27D', '#85B7EB'];
+  for (let i = 0; i < 60; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti go';
+    c.style.left = Math.random() * 100 + '%';
+    c.style.background = colors[i % colors.length];
+    c.style.animationDelay = (Math.random() * 0.4) + 's';
+    c.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+    holder.appendChild(c);
+  }
+  setTimeout(() => holder.innerHTML = '', 3500);
+}
+
+function renderBadges() {
+  const data = Storage.load();
+  const grid = document.getElementById('badgeGrid');
+  grid.innerHTML = '';
+  SITUATIONS.forEach(sit => {
+    const earned = data.badges.find(b => b.name === sit.badge.name);
+    const card = document.createElement('div');
+    card.className = 'badge-card' + (earned ? '' : ' locked');
+    card.innerHTML = `
+      ${BadgeIcons[sit.badge.emoji]}
+      <div class="name">${sit.badge.name}</div>
+      <div class="desc">${earned ? '획득 완료' : '아직 잠김'}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* ============ INIT ============ */
+function init() {
+  Tts.init();
+  renderHome();
+
+  document.getElementById('startBtn').onclick = () => {
+    Session.reset(0);
+    showScreen('game');
+    renderGameScreen();
+    setTimeout(speakCurrent, 400);
+  };
+  document.getElementById('badgesBtn').onclick = () => {
+    renderBadges();
+    showScreen('badges');
+  };
+  document.getElementById('replayBtn').onclick = speakCurrent;
+
+  document.querySelectorAll('[data-act="home"]').forEach(b => b.onclick = () => {
+    Tts.stop();
+    renderHome();
+    showScreen('home');
+  });
+  document.querySelectorAll('[data-act="teacher"]').forEach(b => b.onclick = () => {
+    alert('교사 모드 (프로토타입)\n\n• 상황 건너뛰기\n• 진도 초기화\n• 음성 속도 조절\n\n실제 빌드에서는 이 곳에 컨트롤 패널이 표시됩니다.');
+  });
+
+  document.getElementById('muteBtn').onclick = () => {
+    const on = Tts.toggle();
+    document.getElementById('muteBtn').textContent = on ? '🔊' : '🔇';
+  };
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
